@@ -2,19 +2,18 @@ package com.example.log.controller;
 
 import com.example.log.service.ExternalApiService;
 import com.example.log.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class UserController {
 
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private final ExternalApiService externalApiService;
 
@@ -31,23 +30,11 @@ public class UserController {
         return "User: " + id;
     }
 
-    /**
-     * Test endpoint to demonstrate distributed tracing
-     */
-    @GetMapping("/trace-test")
-    public Map<String, String> traceTest(@RequestParam(required = false) String externalUrl) {
-        log.info("Trace test endpoint called");
-
+    @GetMapping("/call-external")
+    public Map<String, String> callExternal(@RequestParam(required = false) String externalUrl) {
+        log.info("외부 API 호출 요청");
         Map<String, String> response = new HashMap<>();
-        response.put("traceId", MDC.get("traceId"));
-        response.put("spanId", MDC.get("spanId"));
-        response.put("parentSpanId", MDC.get("parentSpanId"));
-        response.put("serviceName", MDC.get("serviceName"));
-        response.put("instanceId", MDC.get("instanceId"));
-        response.put("version", MDC.get("version"));
-        response.put("environment", MDC.get("environment"));
 
-        // Call external API if URL is provided
         if (externalUrl != null && !externalUrl.isEmpty()) {
             try {
                 String externalResponse = externalApiService.callExternalService(externalUrl);
@@ -57,6 +44,13 @@ public class UserController {
             }
         }
 
+        response.put("traceId", MDC.get("traceId"));
+        response.put("spanId", MDC.get("spanId"));
+        response.put("parentSpanId", MDC.get("parentSpanId"));
+        response.put("serviceName", MDC.get("serviceName"));
+        response.put("instanceId", MDC.get("instanceId"));
+        response.put("version", MDC.get("version"));
+        response.put("environment", MDC.get("environment"));
         return response;
     }
 }
