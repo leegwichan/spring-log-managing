@@ -80,7 +80,24 @@ docker-compose logs -f logstash
 
 ## Kibana 설정
 
-### 1. Index Pattern 생성
+### 자동 설정 (권장)
+
+Kibana 시작 후 초기화 스크립트 실행:
+
+```bash
+cd docker
+./kibana-init.sh
+```
+
+자동으로 설정되는 항목:
+- Index Patterns: `spring-logs-dev-*`, `spring-logs-prod-*`, `spring-logs-*`
+- Dashboard: "Spring Boot Application Dashboard" (4개 시각화 포함)
+- Default Index Pattern: `spring-logs-*`
+
+### 수동 설정 (선택)
+
+<details>
+<summary>Index Pattern 수동 생성 (클릭하여 펼치기)</summary>
 
 1. Kibana 접속: http://localhost:5601
 2. 메뉴 → Management → Stack Management → Index Patterns
@@ -92,26 +109,41 @@ docker-compose logs -f logstash
 5. Timestamp field: `@timestamp` 선택
 6. "Create index pattern" 클릭
 
-### 2. 로그 확인
+</details>
+
+### 로그 확인
 
 1. 메뉴 → Discover
-2. 좌측 상단에서 생성한 Index Pattern 선택
+2. 좌측 상단에서 Index Pattern 선택 (기본값: `spring-logs-*`)
 3. 시간 범위 조정 (우측 상단)
 4. 필터 추가:
-   - `app_environment: dev` (dev 환경만)
-   - `app_environment: prod` (prod 환경만)
+   - `environment: dev` (dev 환경만)
+   - `environment: prod` (prod 환경만)
    - `level: ERROR` (에러 로그만)
 
-### 3. 유용한 필드
+### Dashboard 확인
 
-- `app_name`: 애플리케이션 이름
-- `app_version`: 애플리케이션 버전
-- `app_environment`: 환경 (dev/prod)
+1. 메뉴 → Dashboard
+2. "Spring Boot Application Dashboard" 선택
+3. 시각화 항목:
+   - **Logs by Level**: 로그 레벨별 분포
+   - **Request Performance**: 평균 응답 시간
+   - **HTTP Status Distribution**: 상태 코드 분포
+   - **Top Endpoints**: 최다 요청 엔드포인트
+
+### 유용한 필드
+
+- `serviceName`: 서비스 이름
+- `version`: 애플리케이션 버전
+- `environment`: 환경 (dev/prod)
 - `level`: 로그 레벨 (INFO, WARN, ERROR)
 - `logger_name`: 로거 이름 (패키지.클래스)
 - `message`: 로그 메시지
-- `traceId`, `spanId`: 분산 추적 ID
+- `traceId`, `spanId`, `parentSpanId`: 분산 추적 ID
 - `requestUri`, `method`: HTTP 요청 정보
+- `httpStatus`: HTTP 응답 상태 코드
+- `duration`: 요청 처리 시간 (ms)
+- `clientIp`: 클라이언트 IP
 
 ## 환경별 로그 설정
 

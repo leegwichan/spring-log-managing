@@ -64,6 +64,17 @@ docker-compose down -v
 - Spring Boot Prod: http://localhost:8081
 - Logstash TCP: localhost:5001 (mapped from container port 5000)
 
+**Kibana Setup:**
+After starting Kibana, run the initialization script to import pre-configured dashboards and index patterns:
+```bash
+cd docker
+./kibana-init.sh
+```
+- **Index Patterns**: `spring-logs-dev-*`, `spring-logs-prod-*`, `spring-logs-*` (default)
+- **Dashboard**: "Spring Boot Application Dashboard" with 4 visualizations + log search
+- Configuration: `docker/kibana/config/kibana.yml`, `docker/kibana/saved-objects/*.ndjson`
+- See `docker/kibana/README.md` for details
+
 ## Architecture
 
 ### Logging Architecture

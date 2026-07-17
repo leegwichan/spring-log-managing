@@ -1,4 +1,5 @@
 version: '3.8'
+name: spring-log-managing-docker
 
 services:
   elasticsearch:
@@ -26,6 +27,7 @@ services:
     container_name: logstash
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
     ports:
       - "5001:5000/tcp"
       - "5001:5000/udp"
@@ -45,11 +47,18 @@ services:
       - "5601:5601"
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     networks:
       - elk
     depends_on:
       elasticsearch:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   spring-app-dev:
     build:

@@ -1,0 +1,48 @@
+# Logstash 성능 설정
+# 참고: https://www.elastic.co/guide/en/logstash/current/logstash-settings-file.html
+
+# ==================== 파이프라인 설정 ====================
+
+# 필터 처리를 병렬로 수행하는 워커 스레드 수
+# 기본값: CPU 코어 수
+# 권장값: CPU 코어 수 (복잡한 필터) 또는 코어 수 ÷ 2 (단순 필터)
+pipeline.workers: 1
+
+# 파이프라인이 한 번에 처리할 이벤트 개수
+# 기본값: 125
+# 권장값: 저트래픽 125, 중트래픽 250, 고트래픽 500
+pipeline.batch.size: 250
+
+# 배치를 채우기 위해 대기하는 최대 시간 (밀리초)
+# 기본값: 50ms
+# 설명: batch.size에 도달하지 않아도 이 시간이 지나면 처리 시작
+pipeline.batch.delay: 50
+
+# ==================== 큐 설정 ====================
+
+# 큐 타입: memory (기본) 또는 persisted (디스크)
+# memory: 빠르지만 재시작 시 유실
+# persisted: 느리지만 재시작 시에도 보존
+queue.type: memory
+
+# 큐 최대 크기 (메모리 큐는 무시됨, persisted일 때만 유효)
+# queue.max_bytes: 1gb
+
+# ==================== HTTP API 설정 ====================
+
+# 모니터링 API 바인드 주소
+# http://localhost:9600/_node/stats
+http.host: "0.0.0.0"
+http.port: 9600
+
+# ==================== 로그 설정 ====================
+
+# Logstash 자체 로그 레벨
+# 옵션: fatal, error, warn, info, debug, trace
+log.level: info
+
+# ==================== 기타 설정 ====================
+
+# 설정 파일 자동 리로드 (개발 환경용)
+# config.reload.automatic: true
+# config.reload.interval: 3s
