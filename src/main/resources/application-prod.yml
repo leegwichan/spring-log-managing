@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: spring-log-managing
+
+app:
+  service:
+    name: ${spring.application.name}
+    version: 1.0.0
+    environment: prod
+
+logging:
+  level:
+    com.example.log: INFO
+    org.springframework.web: WARN
+  file:
+    path: /var/log/spring-app

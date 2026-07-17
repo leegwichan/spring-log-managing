@@ -1,0 +1,60 @@
+<configuration>
+    <!-- 기본 콘솔 출력 (프로파일 미지정 시) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%X{serviceName}/%X{instanceId}] [trace:%X{traceId} span:%X{spanId}] [%X{method} %X{requestUri}] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- 환경별 분기 -->
+    <springProfile name="dev">
+        <!-- 콘솔 출력, 컬러 로그 -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss} [%X{serviceName}/%X{instanceId}] [trace:%X{traceId} span:%X{spanId}] [%X{method} %X{requestUri}] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <!-- 파일 출력 + JSON 형식 -->
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>logs/application.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>logs/application.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+                <maxHistory>30</maxHistory>
+            </rollingPolicy>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <!-- Distributed Tracing -->
+                <includeMdcKeyName>traceId</includeMdcKeyName>
+                <includeMdcKeyName>spanId</includeMdcKeyName>
+                <includeMdcKeyName>parentSpanId</includeMdcKeyName>
+
+                <!-- Service Identity -->
+                <includeMdcKeyName>serviceName</includeMdcKeyName>
+                <includeMdcKeyName>instanceId</includeMdcKeyName>
+                <includeMdcKeyName>version</includeMdcKeyName>
+                <includeMdcKeyName>environment</includeMdcKeyName>
+
+                <!-- Request Context -->
+                <includeMdcKeyName>requestUri</includeMdcKeyName>
+                <includeMdcKeyName>method</includeMdcKeyName>
+                <includeMdcKeyName>clientIp</includeMdcKeyName>
+
+                <!-- Performance Metrics -->
+                <includeMdcKeyName>httpStatus</includeMdcKeyName>
+                <includeMdcKeyName>duration</includeMdcKeyName>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+</configuration>

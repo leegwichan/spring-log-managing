@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: spring-log-managing
+
+app:
+  service:
+    name: ${spring.application.name}
+    version: 1.0.0
+    environment: dev
+
+logging:
+  level:
+    com.example.log: DEBUG
+    org.springframework.web: DEBUG
